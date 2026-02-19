@@ -1,8 +1,19 @@
-run:
-    @cargo run
+# Grab the name of the current directory to use as the binary name
+BIN_NAME := `basename "$PWD"`
 
 build:
     @cargo build --release
 
+run: build
+    @echo "📦 Converting ELF to UF2..."
+    @elf2uf2-rs convert target/thumbv6m-none-eabi/release/{{BIN_NAME}} flash.uf2
+    @echo "🔌 Mounting RP2040 synchronously (requires sudo)..."
+    @sudo mount -t vfat -o sync /dev/sda1 /mnt/rp2
+    @echo "⚡ Flashing memory..."
+    @sudo cp flash.uf2 /mnt/rp2/
+    @echo "✅ Done! LED should be blinking."
+    @sudo umount /mnt/rp2/ || true
+
 clean:
     @cargo clean
+    @rm -f flash.uf2
