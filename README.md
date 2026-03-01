@@ -2,8 +2,8 @@
 
 ## Steps to flash
 
-1. Connect the board to the laptop. 
-2. When connecting, press the BOOT button and release once you connect it. 
+1. Connect the board to the laptop.
+2. When connecting, press the BOOT button and release once you connect it.
 3. Check the `lsblk` output to see the name of the drive which has been created
 4. Create a directory in `/mnt/rp2` using `sudo mkdir /mnt/rp2/`
 5. Then mount the created drive into `/mnt/rp2/` using `sudo mount -o uid=$(id -u),gid=$(id -g) /dev/sda1 /mnt/rp2`. Replace `sda1` with the created drive
@@ -14,3 +14,4 @@
 ## Programs
 
 1. [LED Flash](./led_flash/src/main.rs)
+2. [Serial Monitor](./uart_serial_monitor/src/main.rs)
