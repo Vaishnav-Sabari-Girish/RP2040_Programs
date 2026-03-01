@@ -15,3 +15,4 @@
 
 1. [LED Flash](./led_flash/src/main.rs)
 2. [Serial Monitor](./uart_serial_monitor/src/main.rs)
+3. [Internal Temperature Sensor](./internal_temp_sensor/src/main.rs)
