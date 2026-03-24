@@ -4,26 +4,26 @@
 use cortex_m_rt::entry;
 use panic_halt as _;
 use rp2040_hal::{
-    clocks::{init_clocks_and_plls, Clock},
+    Sio,
+    clocks::{Clock, init_clocks_and_plls},
     pac,
     pio::PIOExt,
     timer::Timer,
-    watchdog::Watchdog,
-    Sio,
     usb::UsbBus,
+    watchdog::Watchdog,
 };
-use smart_leds::{SmartLedsWrite, RGB8};
+use smart_leds::{RGB8, SmartLedsWrite};
 use ws2812_pio::Ws2812;
 
 // USB Imports
+use static_cell::StaticCell;
 use usb_device::{class_prelude::*, prelude::*};
 use usbd_serial::SerialPort;
-use static_cell::StaticCell;
 
-use heapless::String;
 use core::fmt::Write;
-use rp2040_hal::adc::Adc;
 use embedded_hal_0_2::adc::OneShot;
+use heapless::String;
+use rp2040_hal::adc::Adc;
 
 // --- THE IGNITION KEY ---
 // This places the 256-byte bootloader at the very start of the flash memory.
@@ -37,7 +37,7 @@ pub static BOOT2: [u8; 256] = rp2040_boot2::BOOT_LOADER_W25Q080;
 fn main() -> ! {
     let mut pac = pac::Peripherals::take().unwrap();
     let cp = pac::CorePeripherals::take().unwrap();
-    
+
     let mut wdt = Watchdog::new(pac.WATCHDOG);
 
     let clocks = init_clocks_and_plls(
@@ -69,12 +69,12 @@ fn main() -> ! {
     static USB_BUS: StaticCell<UsbBusAllocator<UsbBus>> = StaticCell::new();
 
     let usb_bus = USB_BUS.init(UsbBusAllocator::new(UsbBus::new(
-                pac.USBCTRL_REGS,
-                pac.USBCTRL_DPRAM,
-                clocks.usb_clock,
-                true,
-                &mut pac.RESETS
-            )));
+        pac.USBCTRL_REGS,
+        pac.USBCTRL_DPRAM,
+        clocks.usb_clock,
+        true,
+        &mut pac.RESETS,
+    )));
 
     let mut serial = SerialPort::new(usb_bus);
 
@@ -84,7 +84,7 @@ fn main() -> ! {
             .product("RP2040-Zero Serial")
             .serial_number("TEST")])
         .unwrap()
-        .device_class(2)  // 2 represents CDC (Communication Device Class)
+        .device_class(2) // 2 represents CDC (Communication Device Class)
         .build();
 
     // ADC stuff
@@ -92,7 +92,7 @@ fn main() -> ! {
     let mut temp_sensor = adc.take_temp_sensor().unwrap();
 
     let (mut pio, sm0, _, _, _) = pac.PIO0.split(&mut pac.RESETS);
-    
+
     // Set up the WS2812 NeoPixel on GP16
     let mut ws = Ws2812::new(
         pins.gpio16.into_function(),
@@ -108,16 +108,17 @@ fn main() -> ! {
     let mut last_time = timer.get_counter();
 
     loop {
-        // POLL the USB device 
+        // POLL the USB device
         // This must be called as often as possible
         if usb_dev.poll(&mut [&mut serial]) {
             let mut buf = [0u8; 64];
 
             // If user types something in the serial monitor read it
-            if let Ok(count) = serial.read(&mut buf) && count > 0 {
-                    // Echo it back
-                    let _ = serial.write(b"\r\nYou typed something!\r\n");
-                
+            if let Ok(count) = serial.read(&mut buf)
+                && count > 0
+            {
+                // Echo it back
+                let _ = serial.write(b"\r\nYou typed something!\r\n");
             }
         }
 
@@ -128,13 +129,13 @@ fn main() -> ! {
             last_time = current_time;
 
             // READ TEMPERATURE
-            // 1. Read RAW ADC values 
+            // 1. Read RAW ADC values
             let raw_temp: u16 = adc.read(&mut temp_sensor).unwrap();
 
             // 2. Convert to voltage
             let voltage = (raw_temp as f32) * (3.3 / 4095.0);
 
-            // 3. Convert voltage to celcius
+            // 3. Convert voltage to celsius
             let temp_c = 27.0 - ((voltage - 0.706) / 0.001721);
 
             // 4. Create a text buffer
@@ -146,13 +147,13 @@ fn main() -> ! {
                     write!(&mut text_buf, "LED: RED  | Temp: {:.2}\r\n", temp_c).unwrap();
                     let _ = serial.write(text_buf.as_bytes());
                     color_state = 1;
-                },
+                }
                 1 => {
                     ws.write([RGB8::new(0, 32, 0)].iter().cloned()).unwrap();
                     write!(&mut text_buf, "LED: GREEN  | Temp: {:.2}\r\n", temp_c).unwrap();
                     let _ = serial.write(text_buf.as_bytes());
                     color_state = 2;
-                },
+                }
                 _ => {
                     ws.write([RGB8::new(0, 0, 32)].iter().cloned()).unwrap();
                     write!(&mut text_buf, "LED: BLUE  | Temp: {:.2}\r\n", temp_c).unwrap();

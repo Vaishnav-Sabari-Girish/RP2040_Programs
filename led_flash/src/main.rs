@@ -4,14 +4,14 @@
 use cortex_m_rt::entry;
 use panic_halt as _;
 use rp2040_hal::{
-    clocks::{init_clocks_and_plls, Clock},
+    Sio,
+    clocks::{Clock, init_clocks_and_plls},
     pac,
     pio::PIOExt,
     timer::Timer,
     watchdog::Watchdog,
-    Sio,
 };
-use smart_leds::{SmartLedsWrite, RGB8};
+use smart_leds::{RGB8, SmartLedsWrite};
 use ws2812_pio::Ws2812;
 
 // --- THE IGNITION KEY ---
@@ -26,7 +26,7 @@ pub static BOOT2: [u8; 256] = rp2040_boot2::BOOT_LOADER_W25Q080;
 fn main() -> ! {
     let mut pac = pac::Peripherals::take().unwrap();
     let cp = pac::CorePeripherals::take().unwrap();
-    
+
     let mut wdt = Watchdog::new(pac.WATCHDOG);
 
     let clocks = init_clocks_and_plls(
@@ -53,7 +53,7 @@ fn main() -> ! {
     );
 
     let (mut pio, sm0, _, _, _) = pac.PIO0.split(&mut pac.RESETS);
-    
+
     // Set up the WS2812 NeoPixel on GP16
     let mut ws = Ws2812::new(
         pins.gpio16.into_function(),
@@ -67,11 +67,11 @@ fn main() -> ! {
         // Red
         ws.write([RGB8::new(32, 0, 0)].iter().cloned()).unwrap();
         delay.delay_ms(500);
-        
+
         // Green
         ws.write([RGB8::new(0, 32, 0)].iter().cloned()).unwrap();
         delay.delay_ms(500);
-        
+
         // Blue
         ws.write([RGB8::new(0, 0, 32)].iter().cloned()).unwrap();
         delay.delay_ms(500);
