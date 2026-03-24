@@ -27,3 +27,4 @@
 2. [Serial Monitor](./uart_serial_monitor/src/main.rs)
 3. [Internal Temperature Sensor](./internal_temp_sensor/src/main.rs)
 4. [E-Paper Display](./e-paper-display/src/main.rs)
+5. [E-Paper Display `ratatui`](./e-paper-display-ratatui/src/main.rs)
