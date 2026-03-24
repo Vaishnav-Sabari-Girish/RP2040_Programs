@@ -121,7 +121,7 @@ fn main() -> ! {
     let mut epd = Epd1in54::new(&mut spi_bus, busy, dc, rst, &mut timer, None).unwrap();
 
     let mut display = Display1in54::default();
-    display.set_rotation(epd_waveshare::prelude::DisplayRotation::Rotate90);
+    display.set_rotation(epd_waveshare::prelude::DisplayRotation::Rotate0);
 
     let mut adapter = DisplayAdapter(display);
 
