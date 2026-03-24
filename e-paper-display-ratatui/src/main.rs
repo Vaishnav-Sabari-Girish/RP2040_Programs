@@ -120,6 +120,12 @@ fn main() -> ! {
 
     let mut epd = Epd1in54::new(&mut spi_bus, busy, dc, rst, &mut timer, None).unwrap();
 
+    // Uncomment the below lines when you wanna clear the display
+
+    //epd.clear_frame(&mut spi_bus, &mut timer).unwrap();
+    //epd.display_frame(&mut spi_bus, &mut timer).unwrap();
+    //epd.sleep(&mut spi_bus, &mut timer).unwrap();
+
     let mut display = Display1in54::default();
     display.set_rotation(epd_waveshare::prelude::DisplayRotation::Rotate0);
 
