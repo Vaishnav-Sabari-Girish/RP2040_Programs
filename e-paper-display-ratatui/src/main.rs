@@ -142,6 +142,7 @@ fn main() -> ! {
     let backend = EmbeddedBackend::new(&mut adapter, backend_config);
     let mut terminal = Terminal::new(backend).unwrap();
 
+    // Comment this line when clearng the display (Uncommenting the above commennted lines)
     terminal.draw(draw).unwrap();
 
     loop {
