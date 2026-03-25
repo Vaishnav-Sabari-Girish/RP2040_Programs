@@ -29,3 +29,4 @@
 4. [E-Paper Display](./e-paper-display/src/main.rs)
 5. [E-Paper Display `ratatui`](./e-paper-display-ratatui/src/main.rs)
 6. [E-Paper Display `tui-big-text`](./e-paper-big-text/src/main.rs)
+7. [E-Paper Display `ascii` text](./e-paper-display-ascii/src/main.rs)
