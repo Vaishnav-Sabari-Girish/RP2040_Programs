@@ -24,9 +24,7 @@ use embedded_graphics::{pixelcolor::Rgb888, prelude::*};
 use core::convert::Infallible;
 
 use mousefood::prelude::*;
-use ratatui::style::Style;
-use ratatui::widgets::{Block, Paragraph, Wrap};
-use ratatui::{Frame, Terminal};
+use ratatui::Terminal;
 
 mod startup;
 
@@ -151,5 +149,3 @@ fn main() -> ! {
         cortex_m::asm::wfi();
     }
 }
-
-fn draw(frame: &mut Frame) {}
