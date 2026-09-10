@@ -1,0 +1,55 @@
+version = "1"
+
+[sigil.build]
+description = "Release build"
+language = "shell"
+silent = true
+run = "cargo build --release"
+
+[sigil.sz]
+description = "Show size"
+language = "shell"
+silent = true
+run = "./build-size.sh ."
+
+[sigil.run]
+description = "Build, convert to UF2 and flash"
+language = "shell"
+silent = false
+run = '''
+./build-size.sh .
+echo "📦 Converting ELF to UF2..."
+elf2uf2-rs convert target/thumbv6m-none-eabi/release/$(basename "$PWD") flash.uf2
+echo "🔌 Mounting RP2040..."
+sudo mount -t vfat -o sync /dev/sda1 /mnt/rp2
+echo "⚡ Flashing..."
+sudo cp flash.uf2 /mnt/rp2/
+echo "✅ Done!"
+sudo umount /mnt/rp2/ || true
+'''
+
+[sigil.nuke]
+description = "Nuke flash memory"
+language = "shell"
+silent = false
+run = '''
+echo "🧹 Nuking RP2040 flash memory..."
+if mountpoint -q /mnt/rp2; then
+    echo "✓ Already mounted"
+else
+    sudo mount -t vfat -o sync /dev/sda1 /mnt/rp2
+fi
+sudo cp flash_nuke.uf2 /mnt/rp2/
+sleep 2
+sudo umount /mnt/rp2/ || true
+echo "✅ Flash memory nuked!"
+'''
+
+[sigil.clean]
+description = "Clean"
+language = "shell"
+silent = true
+run = '''
+cargo clean
+rm -f flash.uf2
+'''

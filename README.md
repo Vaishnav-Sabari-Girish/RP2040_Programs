@@ -89,5 +89,5 @@ The board will automatically reboot and start running your program.
 5. [E-Paper Display `ratatui`](./e-paper-display-ratatui/src/main.rs)
 6. [E-Paper Display `tui-big-text`](./e-paper-big-text/src/main.rs)
 7. [E-Paper Display ASCII text](./e-paper-display-ascii/src/main.rs)
-8. [Conway's Game of Life](./conway_game_of_life/src/main.rs)
-9. [ICM20948 IMU](./icm20948_imu_reading/src/main.rs)
+8. [ICM20948 IMU](./icm20948_imu_reading/src/main.rs)
+9. [Basic TFT with `ratatui`](./tft_display_basic/src/main.rs)
