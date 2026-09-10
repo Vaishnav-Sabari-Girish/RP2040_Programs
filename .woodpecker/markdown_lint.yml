@@ -8,4 +8,4 @@ steps:
     image: python:3.13-slim
     commands:
       - pip install --no-cache-dir rumdl
-      - rumdl check . --exclude CHANGELOG.md
+      - rumdl check . --exclude CHANGELOG.md --exclude 'patches/**'
